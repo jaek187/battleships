@@ -157,6 +157,7 @@ class AssetsManager {
     hit = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/hit.ogg")).string().c_str());
     sink = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/sink.ogg")).string().c_str());
     miss = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/miss.ogg")).string().c_str());
+    start = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/play.mp3")).string().c_str());
   }
 
 public:
@@ -169,6 +170,7 @@ public:
   Sound hit;
   Sound miss;
   Sound sink;
+  Sound start;
 
   AssetsManager() {
     InitAudioDevice();

@@ -8,8 +8,8 @@ JoinServer::JoinServer(GameContext &gameContext, Texture2D &background)
     , widgets(gameContext, 0.1, 0.1, 0.4, 0.1) {
   widgets.push_back_ipInput(gameContext.settings.serverUrl);
 
-  widgets.push_back_button("Join", [this, &gameContext]() {
-    onEveryClick();
+  widgets.push_back_button("Join", [&gameContext]() {
+    PlaySound(gameContext.assetsManager.start);
     gameContext.settings.save();
     gameContext.guiState = GuiState::GAME;
   });

@@ -7,8 +7,8 @@ ModeSelection::ModeSelection(GameContext &gameContext, Texture2D &background)
     : Scene(gameContext, background)
     , widgets(gameContext, 0.2f, 0.02f, 0.5f, 0.1f) {
 
-  widgets.push_back_button("Host Game", [this, &gameContext]() {
-    onEveryClick();
+  widgets.push_back_button("Host Game", [&gameContext]() {
+    PlaySound(gameContext.assetsManager.start);
     gameContext.currentGameMode = GameContext::GameMode::HOSTING;
     gameContext.guiState = GuiState::GAME;
   });
