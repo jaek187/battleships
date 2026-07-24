@@ -211,6 +211,9 @@ public:
     UnloadSound(start);
     CloseAudioDevice();
   }
+
+  AssetsManager(const AssetsManager &as) = delete;
+  AssetsManager &operator=(const AssetsManager &as) = delete;
 };
 
 class GameContext {
