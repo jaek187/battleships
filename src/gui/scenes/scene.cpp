@@ -4,7 +4,12 @@ namespace battleship {
 namespace gui {
 Scene::Scene(GameContext &gameContext, Texture2D &background)
     : gameContext(gameContext)
-    , background(background) {}
+    , background(background) {
+  if (!IsTextureValid(background)) {
+    spdlog::warn("[GUI] background image not loaded correctly!");
+    return;
+  }
+}
 
 void Scene::update() {
   updateSceneRect();
