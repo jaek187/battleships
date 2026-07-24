@@ -210,11 +210,18 @@ void Client::handleShotResult(Message &msg) {
     return;
   }
   battleship::logic::FieldState result;
+
   unsigned short int row, column;
 
   column = msg.pop<unsigned short int>();
   row = msg.pop<unsigned short int>();
   result = msg.pop<battleship::logic::FieldState>();
+
+  if (onShotResult) {
+    onShotResult(result);
+  } else {
+    spdlog::warn("[Client] onShotResult not set!");
+  }
 
   markResultFunc(result, row, column);
 }
@@ -277,6 +284,10 @@ void Client::setMarkResultFunc(
 
 void Client::setOnShotRecieve(std::function<void()> func) {
   onShotRecieve = func;
+}
+
+void Client::setOnShotResult(std::function<void(logic::FieldState)> func) {
+  onShotResult = func;
 }
 
 } // namespace networking
