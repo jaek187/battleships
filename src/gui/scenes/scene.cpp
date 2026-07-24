@@ -24,5 +24,9 @@ void Scene::draw() {
                  backgroundTint);
 }
 
+void Scene::onEveryClick() {
+  PlaySound(gameContext.assetsManager.click);
+}
+
 } // namespace gui
 } // namespace battleship
