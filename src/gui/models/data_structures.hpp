@@ -199,7 +199,6 @@ public:
   }
 
   ~AssetsManager() {
-    CloseAudioDevice();
     UnloadTexture(bg1);
     UnloadTexture(bg2);
     UnloadTexture(bg3);
@@ -209,6 +208,8 @@ public:
     UnloadSound(hit);
     UnloadSound(miss);
     UnloadSound(sink);
+    UnloadSound(start);
+    CloseAudioDevice();
   }
 };
 
