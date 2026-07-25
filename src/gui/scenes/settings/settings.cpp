@@ -10,7 +10,9 @@ Settings::Settings(GameContext &gameContext, Texture2D &background)
 
   widgets.push_back_label("Player options", BLACK);
   widgets.push_back_nameInput(gameContext.settings.playerName);
-  widgets.push_back_button("Go back", [&gameContext]() {
+  widgets.push_back_button("Go back", [this, &gameContext]() {
+    onEveryClick();
+
     if (gameContext.settings.playerName.empty()) {
       spdlog::warn("[GUI] trying to save empty name. That's a nono!");
       return;

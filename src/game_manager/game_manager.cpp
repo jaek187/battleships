@@ -111,5 +111,9 @@ bool GameManager::isMyTurn() {
   return client.isMyTurn;
 }
 
+void GameManager::setOnShotResult(std::function<void(logic::FieldState)> func) {
+  client.setOnShotResult(func);
+}
+
 } // namespace gameManager
 } // namespace battleship

@@ -39,6 +39,8 @@ public:
   bool isGameWon() const;
   bool isConnected() const;
   bool isMyTurn();
+
+  void setOnShotResult(std::function<void(logic::FieldState)> func);
 };
 } // namespace gameManager
 } // namespace battleship

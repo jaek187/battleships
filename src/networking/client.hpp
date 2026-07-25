@@ -20,6 +20,7 @@ class Client {
   std::function<battleship::logic::FieldState(unsigned short int, unsigned short int)> recieveAttackFunc;
   std::function<void(battleship::logic::FieldState, unsigned short int, unsigned short int)> markResultFunc;
   std::function<void()> onShotRecieve;
+  std::function<void(logic::FieldState state)> onShotResult;
 
   void send(const Message &msg);
   void onMessage(Message &msg);
@@ -68,6 +69,7 @@ public:
   void
   setMarkResultFunc(std::function<void(battleship::logic::FieldState, unsigned short int, unsigned short int)> func);
   void setOnShotRecieve(std::function<void()> func);
+  void setOnShotResult(std::function<void(logic::FieldState)> func);
 };
 } // namespace networking
 } // namespace battleship

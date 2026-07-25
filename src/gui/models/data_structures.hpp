@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <raylib.h>
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -137,8 +138,94 @@ public:
   };
 };
 
-struct GameContext {
+class AssetsManager {
+  std::filesystem::path pathPrefix;
+  // we first change to string then to c_str, because windows is bad
+  std::vector<std::filesystem::path> expectedPaths = {std::filesystem::path("/usr/share/battleship"),
+                                                      std::filesystem::path(GetApplicationDirectory()) /
+                                                          std::filesystem::path("./assets"),
+                                                      std::filesystem::path("./assets")};
+  void loadPaths() {
+    bg1 = LoadTexture(std::filesystem::path(pathPrefix / std::filesystem::path("gfx/bg1.jpg")).string().c_str());
+    bg2 = LoadTexture(std::filesystem::path(pathPrefix / std::filesystem::path("gfx/bg2.jpg")).string().c_str());
+    bg3 = LoadTexture(std::filesystem::path(pathPrefix / std::filesystem::path("gfx/bg3.jpg")).string().c_str());
+    playBackground = LoadTexture(
+        std::filesystem::path(pathPrefix / std::filesystem::path("gfx/play_background.jpg")).string().c_str());
+
+    click = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/click.mp3")).string().c_str());
+
+    hit = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/hit.ogg")).string().c_str());
+    sink = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/sink.ogg")).string().c_str());
+    miss = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/miss.ogg")).string().c_str());
+    start = LoadSound(std::filesystem::path(pathPrefix / std::filesystem::path("sfx/play.mp3")).string().c_str());
+  }
+
+public:
+  Texture2D bg1;
+  Texture2D bg2;
+  Texture2D bg3;
+  Texture2D playBackground;
+
+  Sound click;
+  Sound hit;
+  Sound miss;
+  Sound sink;
+  Sound start;
+
+  AssetsManager() {
+    InitAudioDevice();
+    char *envPath = std::getenv("BATTLESHIPS_ASSETS_DIR");
+
+    if (envPath) {
+      pathPrefix = std::filesystem::path(envPath);
+      spdlog::info("[GUI] Env variable BATTLESHIPS_ASSETS_DIR was set. Setting pathPrefix as: {}", envPath);
+      loadPaths();
+      return;
+    }
+
+    for (const auto &path : expectedPaths) {
+      if (std::filesystem::is_directory(path)) {
+        pathPrefix = std::filesystem::absolute(path);
+        spdlog::info("[GUI] found assets path at: {}", pathPrefix.string());
+        break;
+      }
+    }
+    if (!pathPrefix.empty()) {
+      loadPaths();
+      return;
+    }
+
+    spdlog::warn("[GUI] could not fine any viable asset directory");
+  }
+
+  ~AssetsManager() {
+    UnloadTexture(bg1);
+    UnloadTexture(bg2);
+    UnloadTexture(bg3);
+    UnloadTexture(playBackground);
+
+    UnloadSound(click);
+    UnloadSound(hit);
+    UnloadSound(miss);
+    UnloadSound(sink);
+    UnloadSound(start);
+    CloseAudioDevice();
+  }
+
+  AssetsManager(const AssetsManager &as) = delete;
+  AssetsManager &operator=(const AssetsManager &as) = delete;
+};
+
+class GameContext {
+public:
+  GameContext()
+      : assetsManager(AssetsManager()) {
+    settings.load();
+  }
+
   GameSettings settings;
+  AssetsManager assetsManager;
+
   std::string loserName;
   bool isWon;
   std::atomic<GuiState> guiState = GuiState::MAIN_MENU;

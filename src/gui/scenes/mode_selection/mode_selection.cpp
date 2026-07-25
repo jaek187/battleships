@@ -8,15 +8,20 @@ ModeSelection::ModeSelection(GameContext &gameContext, Texture2D &background)
     , widgets(gameContext, 0.2f, 0.02f, 0.5f, 0.1f) {
 
   widgets.push_back_button("Host Game", [&gameContext]() {
+    PlaySound(gameContext.assetsManager.start);
     gameContext.currentGameMode = GameContext::GameMode::HOSTING;
     gameContext.guiState = GuiState::GAME;
   });
 
-  widgets.push_back_button("Join Game", [&gameContext]() {
+  widgets.push_back_button("Join Game", [this, &gameContext]() {
+    onEveryClick();
     gameContext.currentGameMode = GameContext::GameMode::JOINING;
     gameContext.guiState = GuiState::JOIN_SERVER;
   });
-  widgets.push_back_button("Go back", [this]() { goBack(); });
+  widgets.push_back_button("Go back", [this]() {
+    onEveryClick();
+    goBack();
+  });
 }
 
 ModeSelection::~ModeSelection() {}

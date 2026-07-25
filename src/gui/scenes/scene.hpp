@@ -28,6 +28,9 @@ public:
 
   /// @brief Draw background image scaled to the window size
   virtual void draw();
+
+  /// @brief Action that should happen on every widget click in this scene
+  virtual void onEveryClick();
 };
 } // namespace gui
 } // namespace battleship

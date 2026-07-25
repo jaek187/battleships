@@ -93,6 +93,23 @@ Game::Game(GameContext &gameContext, Texture2D &background)
   spdlog::info("[GUI] Game constructor run");
 
   std::string prevUrl = gameContext.settings.serverUrl;
+
+  gameManager.setOnShotResult([&gameContext](logic::FieldState state) {
+    switch (state) {
+    case logic::FieldState::HIT:
+      PlaySound(gameContext.assetsManager.hit);
+      break;
+    case logic::FieldState::SUNK:
+      PlaySound(gameContext.assetsManager.sink);
+      break;
+    case logic::FieldState::MISSED:
+      PlaySound(gameContext.assetsManager.miss);
+      break;
+    default:
+      break;
+    }
+  });
+
   if (gameContext.currentGameMode == GameContext::GameMode::HOSTING) {
     server = std::make_unique<networking::Server>(gameContext.settings.serverPort);
     if (!server->start()) {
