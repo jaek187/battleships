@@ -17,7 +17,7 @@ protected:
   Color backgroundTint = WHITE;
 
   Rectangle sceneRect = {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
-  NPatchInfo patchInfo = {sceneRect, 0, 0};
+  NPatchInfo patchInfo = {sceneRect, 0, 0, 0, 0, 0};
 
 public:
   Scene(GameContext &gameContext, Texture2D &background);

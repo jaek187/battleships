@@ -42,12 +42,12 @@ void Server::stop() {
   isRunning = false;
   queIn.stop();
 
-  boost::system::error_code ec;
-  acceptor.close(ec);
-
-  if (ec) {
-    spdlog::warn("[Server] error while stopping: {}", ec.message());
+  try {
+    acceptor.close();
+  } catch (std::exception &e) {
+    spdlog::warn("[Server] error while stopping: {}", e.what());
   }
+
   context.stop();
 
   if (thread.joinable()) {
@@ -133,7 +133,7 @@ bool Server::isServerRunning() const {
 }
 
 // === Event handlers ===
-bool Server::onClientConnect(std::shared_ptr<Connection> client) {
+bool Server::onClientConnect(std::shared_ptr<Connection>) {
   if (playerList.isFull()) {
     return false;
   }
@@ -271,7 +271,7 @@ void Server::handleClientSendingAttack(std::shared_ptr<Connection> client, Messa
   victim->connection->send(msg);
 }
 
-void Server::handleClientRecievingAttack(std::shared_ptr<Connection> client, Message &msg) {
+void Server::handleClientRecievingAttack(std::shared_ptr<Connection>, Message &msg) {
   Message msgCpy = msg;
   auto attackerId = msgCpy.header.receiver;
   auto attacker = playerList.getPlayerById(attackerId);
@@ -279,8 +279,11 @@ void Server::handleClientRecievingAttack(std::shared_ptr<Connection> client, Mes
     spdlog::error("[Server] attacker in recieving attack is nullptr...");
     return;
   }
-  auto column = msgCpy.pop<unsigned short int>();
-  auto row = msgCpy.pop<unsigned short int>();
+
+  // we static cast this to void, because we don't care about coordinates
+  static_cast<void>(msgCpy.pop<unsigned short int>());
+  static_cast<void>(msgCpy.pop<unsigned short int>());
+
   auto result = msgCpy.pop<battleship::logic::FieldState>();
 
   attacker->connection->send(msg);
@@ -293,7 +296,7 @@ void Server::handleClientRecievingAttack(std::shared_ptr<Connection> client, Mes
   broadcastCurrentTurn();
 }
 
-void Server::handleGameEnd(std::shared_ptr<Connection> client, Message &msg) {
+void Server::handleGameEnd(std::shared_ptr<Connection> client, Message &) {
   globalGameStatus = GameStatus::GAME_FINISH;
 
   Message statusMsg; // TODO! This is the same code as in handleGameStatusChange. Could be moved to another function

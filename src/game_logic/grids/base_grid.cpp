@@ -19,7 +19,7 @@ void BaseGrid::setFieldState(unsigned short int row, unsigned short int column, 
 
 std::string BaseGrid::asString() const {
   std::stringstream s;
-  for (size_t fieldIndex = 0; fieldIndex < WIDTH * HEIGHT; fieldIndex++) {
+  for (unsigned short int fieldIndex = 0; fieldIndex < WIDTH * HEIGHT; fieldIndex++) {
     s << static_cast<char>(grid[fieldIndex].getState());
     if (fieldIndex % WIDTH == 0) {
       s << '\n';
@@ -50,7 +50,7 @@ void BaseGrid::markNearbyAsSunk(unsigned short int row, unsigned short int colum
           continue;
         }
 
-        if (checkRow >= 0 && checkRow < HEIGHT && checkColumn >= 0 && checkColumn < WIDTH) {
+        if (checkRow < HEIGHT && checkColumn < WIDTH) {
 
           if (getFieldState(checkRow, checkColumn) == FieldState::HIT) {
             toCheck.push_back(std::make_tuple(checkRow, checkColumn));
