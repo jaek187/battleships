@@ -16,10 +16,10 @@ Connection::Connection(Owner owner,
                        boost::asio::io_context &context,
                        boost::asio::ip::tcp::socket socket,
                        MessageQueue &qIn)
-    : owner(owner)
-    , socket(std::move(socket))
+    : socket(std::move(socket))
     , context(context)
     , queIn(qIn)
+    , owner(owner)
     , id(boost::uuids::random_generator()()) {}
 
 void Connection::connectToServer(const boost::asio::ip::tcp::resolver::results_type &endpoints,
@@ -29,7 +29,7 @@ void Connection::connectToServer(const boost::asio::ip::tcp::resolver::results_t
     boost::asio::async_connect(
         socket,
         endpoints,
-        [this, self = shared_from_this(), onResult](std::error_code ec, boost::asio::ip::tcp::endpoint endpoint) {
+        [this, self = shared_from_this(), onResult](std::error_code ec, boost::asio::ip::tcp::endpoint) {
           if (!ec) {
             readHeader();
 
@@ -83,7 +83,7 @@ void Connection::startListening() {
 void Connection::writeHeader() {
   boost::asio::async_write(socket,
                            boost::asio::buffer(&queOut.front().msg.header, sizeof(MessageHeader)),
-                           [this, self = shared_from_this()](std::error_code ec, size_t length) {
+                           [this, self = shared_from_this()](std::error_code ec, size_t) {
                              if (ec) {
                                disconnect();
                                return;
@@ -102,7 +102,7 @@ void Connection::writeHeader() {
 void Connection::writeBody() {
   boost::asio::async_write(socket,
                            boost::asio::buffer(queOut.front().msg.body.msg.data(), queOut.front().msg.body.size()),
-                           [this, self = shared_from_this()](std::error_code ec, size_t length) {
+                           [this, self = shared_from_this()](std::error_code ec, size_t) {
                              if (ec) {
                                spdlog::error("[Network] {} Write body fail", boost::uuids::to_string(id));
                                disconnect();
@@ -118,7 +118,7 @@ void Connection::writeBody() {
 void Connection::readHeader() {
   boost::asio::async_read(socket,
                           boost::asio::buffer(&temporaryMessage.header, sizeof(MessageHeader)),
-                          [this, self = shared_from_this()](boost::system::error_code ec, size_t length) {
+                          [this, self = shared_from_this()](boost::system::error_code ec, size_t) {
                             if (ec) {
                               if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset) {
                                 spdlog::info("[Network] {} disconnected", boost::uuids::to_string(id));
@@ -148,7 +148,7 @@ void Connection::readHeader() {
 void Connection::readBody() {
   boost::asio::async_read(socket,
                           boost::asio::buffer(temporaryMessage.body.msg.data(), temporaryMessage.body.size()),
-                          [this, self = shared_from_this()](std::error_code ec, size_t length) {
+                          [this, self = shared_from_this()](std::error_code ec, size_t) {
                             if (ec) {
                               spdlog::error("[Network] {} Read body fail.", boost::uuids::to_string(id));
                               disconnect();
